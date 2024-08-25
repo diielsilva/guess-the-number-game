@@ -1,17 +1,15 @@
 package com.ddev.guess_the_number.domain.repositories;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.ddev.guess_the_number.domain.exceptions.DatabaseException;
 import com.ddev.guess_the_number.domain.models.Answer;
 import com.ddev.guess_the_number.domain.models.Match;
 
@@ -27,41 +25,33 @@ public class MatchRepositoryTest {
 
     @Test
     void create_MatchShouldBeSaved() {
-        Match created = repository.create(new Match("123", new Answer(10), new ArrayList<>()));
+        Match created = repository.store(new Match("123", new Answer(10)));
 
-        assertNotNull(created.id());
+        assertNotNull(created.id);
     }
 
     @Test
     void retrieve_MatchShouldBeReturned() {
-        Match created = repository.create(new Match(null, new Answer(10), List.of()));
+        Match created = repository.store(new Match(new Answer(10)));
 
-        Optional<Match> retrieved = repository.retrieve(created.id());
-
-        assertTrue(retrieved.isPresent());
+        assertDoesNotThrow(() -> repository.retrieve(created.id));
     }
 
     @Test
     void retrieve_MatchShouldNotBeReturned_WhenIdIsNotFound() {
-        Optional<Match> retrieved = repository.retrieve("123");
-
-        assertTrue(retrieved.isEmpty());
+        assertThrows(DatabaseException.class, () -> repository.retrieve("12345"));
     }
 
     @Test
     void remove_MatchShouldBeRemoved() {
-        Match created = repository.create(new Match(null, new Answer(10), new ArrayList<>()));
+        Match created = repository.store(new Match(new Answer(10)));
 
-        Optional<Match> removed = repository.remove(created.id());
-    
-        assertTrue(removed.isPresent());
+        assertDoesNotThrow(() -> repository.remove(created.id));
     }
 
     @Test
     void remove_MatchShouldNotBeRemoved_WhenIdIsNotFound() {
-        Optional<Match> removed = repository.remove("123");
-
-        assertTrue(removed.isEmpty());
+        assertThrows(DatabaseException.class, () -> repository.remove("12345"));
     }
 
 }

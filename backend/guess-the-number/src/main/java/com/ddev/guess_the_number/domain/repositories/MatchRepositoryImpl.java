@@ -1,13 +1,12 @@
 package com.ddev.guess_the_number.domain.repositories;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import com.ddev.guess_the_number.domain.exceptions.DatabaseException;
 import com.ddev.guess_the_number.domain.models.Match;
 
 @Repository
@@ -16,31 +15,38 @@ public class MatchRepositoryImpl implements MatchRepository {
     private final Map<String, Match> database = new HashMap<>();
 
     @Override
-    public Match create(Match model) {
-        String id = generateRandomId();
-        Match created = new Match(id, model.answer(), new ArrayList<>());
+    public Match store(Match match) {
+        String id = UUID.randomUUID().toString();
 
-        database.put(id, created);
+        if (match.id == null) {
+            match.id = id;
+        }
 
-        return created;
+        database.put(match.id, match);
+
+        return match;
     }
 
     @Override
-    public Optional<Match> retrieve(String id) {
-        Match retrieved = database.get(id);
+    public Match retrieve(String id) {
+        boolean exists = database.containsKey(id);
 
-        return retrieved == null ? Optional.empty() : Optional.of(retrieved);
+        if (!exists) {
+            throw new DatabaseException(String.format("Match %s not found!", id));
+        }
+
+        return database.get(id);
     }
 
     @Override
-    public Optional<Match> remove(String id) {
-        Match deleted = database.remove(id);
+    public Match remove(String id) {
+        boolean exists = database.containsKey(id);
 
-        return deleted == null ? Optional.empty() : Optional.of(deleted);
-    }
+        if (!exists) {
+            throw new DatabaseException(String.format("Match %s not found!", id));
+        }
 
-    private String generateRandomId() {
-        return UUID.randomUUID().toString();
+        return database.remove(id);
     }
 
 }
