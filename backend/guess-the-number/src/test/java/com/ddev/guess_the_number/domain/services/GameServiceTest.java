@@ -17,7 +17,7 @@ import com.ddev.guess_the_number.domain.enums.GameState;
 import com.ddev.guess_the_number.domain.models.Answer;
 import com.ddev.guess_the_number.domain.models.Match;
 import com.ddev.guess_the_number.domain.repositories.MatchRepository;
-import com.ddev.guess_the_number.shared.dtos.CurrentGame;
+import com.ddev.guess_the_number.shared.dtos.ApiResponse;
 import com.ddev.guess_the_number.shared.dtos.UserMove;
 
 @ExtendWith(value = SpringExtension.class)
@@ -43,7 +43,7 @@ class GameServiceTest {
 
     @Test
     void start_GameShouldBeStarted() {
-        CurrentGame game = service.start();
+        ApiResponse game = service.start();
 
         assertAll(() -> {
             assertEquals(GameState.PLAYING, game.state());
@@ -53,7 +53,7 @@ class GameServiceTest {
 
     @Test
     void play_GameShouldBeFinished_WhenAnswerIsCorrect() {
-        CurrentGame game = service.play(new UserMove("12345", 10));
+        ApiResponse game = service.play(new UserMove("12345", 10));
 
         assertAll(() -> {
             assertEquals(GameState.FINISHED, game.state());
@@ -63,7 +63,7 @@ class GameServiceTest {
 
     @Test
     void play_GameShouldNotBeFinished_WhenAnswerIsIncorrect() {
-        CurrentGame game = service.play(new UserMove("12345", 1));
+        ApiResponse game = service.play(new UserMove("12345", 1));
 
         assertAll(() -> {
             assertEquals(GameState.PLAYING, game.state());
