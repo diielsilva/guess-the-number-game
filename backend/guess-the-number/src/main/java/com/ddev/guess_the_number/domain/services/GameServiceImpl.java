@@ -39,7 +39,15 @@ public class GameServiceImpl implements GameService {
             game = new ApiResponse(match, GameState.FINISHED, "Game finished!");
             repository.remove(match);
         } else {
-            game = new ApiResponse(match, GameState.PLAYING, "Wrong answer, try again!");
+            String message = "";
+
+            if (move.userAnswer() > retrieved.answer.value) {
+                message = "Your answer is greater than the correct answer!";
+            } else {
+                message = "Your answer is lesser than the correct answer!";
+            }
+
+            game = new ApiResponse(match, GameState.PLAYING, message);
             retrieved.attempts.add(new Attempt(move.userAnswer(), LocalDateTime.now()));
             repository.store(retrieved);
         }

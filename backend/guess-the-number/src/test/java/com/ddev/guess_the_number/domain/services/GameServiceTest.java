@@ -62,12 +62,22 @@ class GameServiceTest {
     }
 
     @Test
-    void play_GameShouldNotBeFinished_WhenAnswerIsIncorrect() {
+    void play_GameShouldNotBeFinished_WhenAnswerIsLesserThanTheCorrectAnswer() {
         ApiResponse game = service.play(new UserMove("12345", 1));
 
         assertAll(() -> {
             assertEquals(GameState.PLAYING, game.state());
-            assertEquals("Wrong answer, try again!", game.message());
+            assertEquals("Your answer is lesser than the correct answer!", game.message());
+        });
+    }
+
+    @Test
+    void play_GameShouldNotBeFinished_WhenAnswerIsGreaterThanTheCorrectAnswer() {
+        ApiResponse game = service.play(new UserMove("12345", 11));
+
+        assertAll(() -> {
+            assertEquals(GameState.PLAYING, game.state());
+            assertEquals("Your answer is greater than the correct answer!", game.message());
         });
     }
 
