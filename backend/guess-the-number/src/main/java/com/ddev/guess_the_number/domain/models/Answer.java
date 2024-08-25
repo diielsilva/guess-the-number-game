@@ -1,5 +1,11 @@
 package com.ddev.guess_the_number.domain.models;
 
-public record Answer(int value) {
-    
+public class Answer {
+
+    public final int value;
+
+    public Answer(int value) {
+        this.value = value;
+    }
+
 }

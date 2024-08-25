@@ -2,6 +2,14 @@ package com.ddev.guess_the_number.domain.models;
 
 import java.time.LocalDateTime;
 
-public record Attempt(int value, LocalDateTime date) {
+public class Attempt {
+
+    public final int value;
+    public final LocalDateTime attemptDate;
+
+    public Attempt(int value, LocalDateTime attemptDate) {
+        this.value = value;
+        this.attemptDate = attemptDate;
+    }
 
 }
