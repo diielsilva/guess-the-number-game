@@ -106,7 +106,7 @@ jobs:
          file: backend/Dockerfile
          push: true
          platforms: linux/amd64
-         tags: ${{ secrets.DOCKER_USERNAME }}/guess-the-number-backend:latest
+         tags: ${{ secrets.DOCKER_USERNAME }}/guess-the-number-backend:${{ steps.extract_version.outputs.VERSION }}
  
   deploy:
     name: Deploy to Oracle Cloud
