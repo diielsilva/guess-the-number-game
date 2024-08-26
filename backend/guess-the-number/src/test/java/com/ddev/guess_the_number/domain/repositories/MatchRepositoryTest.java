@@ -54,4 +54,13 @@ public class MatchRepositoryTest {
         assertThrows(DatabaseException.class, () -> repository.remove("12345"));
     }
 
+    @Test
+    void clean_MatchesShouldBeRemoved() {
+        Match created = repository.store(new Match(new Answer(10)));
+
+        repository.clean();
+
+        assertThrows(DatabaseException.class, () -> repository.retrieve(created.id));
+    }
+
 }

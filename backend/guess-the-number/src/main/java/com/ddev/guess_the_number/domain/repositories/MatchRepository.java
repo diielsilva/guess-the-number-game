@@ -9,4 +9,6 @@ public interface MatchRepository {
     Match retrieve(String id) throws DatabaseException;
 
     Match remove(String id);
+
+    void clean();
 }

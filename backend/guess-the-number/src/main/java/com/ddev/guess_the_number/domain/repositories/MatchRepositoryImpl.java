@@ -2,6 +2,7 @@ package com.ddev.guess_the_number.domain.repositories;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
@@ -47,6 +48,15 @@ public class MatchRepositoryImpl implements MatchRepository {
         }
 
         return database.remove(id);
+    }
+
+    @Override
+    public void clean() {
+        Set<String> keys = database.keySet();
+
+        for (String key : keys) {
+            database.remove(key);
+        }
     }
 
 }
