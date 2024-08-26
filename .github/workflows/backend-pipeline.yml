@@ -10,7 +10,7 @@ on:
 
 jobs:
   compile:
-    runs-on: ubuntu
+    runs-on: ubuntu-24.04
     name: Compile Project
     steps:
       - name: Checkout Code
@@ -30,7 +30,7 @@ jobs:
           ./mvnw clean compile
     
   unit-tests:
-    runs-on: ubuntu
+    runs-on: ubuntu-24.04
     name: Unit Tests
     steps:
       - name: Checkout Code
@@ -49,7 +49,7 @@ jobs:
           ./mvnw clean package
   
   build:
-    runs-on: ubuntu
+    runs-on: ubuntu-24.04
     name: Build Backend
     needs: [compile, unit-tests]
     steps:
@@ -69,7 +69,7 @@ jobs:
           ./mvnw clean package
   
   docker-image:
-    runs-on: ubuntu
+    runs-on: ubuntu-24.04
     name: Build Backend
     needs: [build]
     steps:
@@ -106,7 +106,7 @@ jobs:
  
   deploy:
     name: Deploy to Oracle Cloud
-    runs-on: ubuntu
+    runs-on: ubuntu-24.04
     needs: [docker-image]
     steps:
       - name: Create Deployment Folder
