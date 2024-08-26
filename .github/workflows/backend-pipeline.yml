@@ -1,0 +1,122 @@
+name: Guess The Number Backend Pipeline
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - backend/**
+      - .github/workflows/backend-pipeline.yml
+
+jobs:
+  compile:
+    runs-on: ubuntu
+    name: Compile Project
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Setup JDK
+        uses: actions/setup-jdk@v4
+        with:
+          java-version: 21
+          distribution: corretto
+          
+      - name: Compile Project
+        run: |
+          cd backend/guess-the-number
+          ./mvnw clean compile
+    
+  unit-tests:
+    runs-on: ubuntu
+    name: Unit Tests
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Setup JDK
+        uses: actions/setup-jdk@v4
+        with:
+          java-version: 21
+          distribution: corretto 
+      - name: Running Tests
+        run: |
+          cd backend/guess-the-number
+          ./mvnw clean package
+  
+  build:
+    runs-on: ubuntu
+    name: Build Backend
+    needs: [compile, unit-tests]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Setup JDK
+        uses: actions/setup-jdk@v4
+        with:
+          java-version: 21
+          distribution: corretto
+      - name: Build Project
+        run: |
+          cd backend/guess-the-number
+          ./mvnw clean package
+  
+  docker-image:
+    runs-on: ubuntu
+    name: Build Backend
+    needs: [build]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        
+      - name: Setup JDK
+        uses: actions/setup-jdk@v4
+        with:
+          java-version: 21
+          distribution: corretto
+
+      - name: Extract Project Version
+        id: extract_version
+        run: |
+          cd backend/guess-the-number
+          echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+            
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}  
+          password: ${{ secrets.DOCKERHUB_TOKEN }}  
+    
+      - name: Build and Push Image to DockerHub
+        uses: docker/build-push-action@v5
+        with:
+         file: backend/Dockerfile
+         push: true
+         platforms: linux/amd64
+         tags: ${{ secrets.DOCKER_USERNAME }}/guess-the-number-backend:latest
+ 
+  deploy:
+    name: Deploy to Oracle Cloud
+    runs-on: ubuntu
+    needs: [docker-image]
+    steps:
+      - name: Create Deployment Folder
+        run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
+      
+      - name: Copy Docker Image
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
+          cd ci-cd
+          docker run -d -p 8080:8080 diielsilva/guess-the-number-backend:latest
+          EOF
+       
+        
