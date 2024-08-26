@@ -73,7 +73,7 @@ jobs:
   
   docker-image:
     runs-on: ubuntu-24.04
-    name: Build Backend
+    name: Pushing Image to Docker Hub
     needs: [build]
     steps:
       - name: Checkout Code
