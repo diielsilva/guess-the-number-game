@@ -27,7 +27,7 @@ jobs:
       - name: Compile Project
         run: |
           cd backend/guess-the-number
-          sudo ./mvnw clean compile
+          ./mvnw clean compile
     
   unit-tests:
     runs-on: ubuntu-24.04
@@ -46,7 +46,7 @@ jobs:
       - name: Running Tests
         run: |
           cd backend/guess-the-number
-          sudo ./mvnw clean package
+          ./mvnw clean test
   
   build:
     runs-on: ubuntu-24.04
@@ -66,7 +66,7 @@ jobs:
       - name: Build Project
         run: |
           cd backend/guess-the-number
-          sudo ./mvnw clean package
+          ./mvnw clean compile
   
   docker-image:
     runs-on: ubuntu-24.04
@@ -88,7 +88,7 @@ jobs:
         id: extract_version
         run: |
           cd backend/guess-the-number
-          echo "VERSION=$(sudo ./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+          echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
             
       - name: Login to DockerHub
         uses: docker/login-action@v3
