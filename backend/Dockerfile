@@ -3,7 +3,7 @@ FROM maven:3.9.9-amazoncorretto-21 AS build
 WORKDIR /build
 COPY ./guess-the-number/pom.xml .
 RUN mvn dependency:go-offline
-COPY ./guess-the-number/src ./src
+COPY ./guess-the-number/src .
 RUN mvn clean package
 
 # Runtime Stage
