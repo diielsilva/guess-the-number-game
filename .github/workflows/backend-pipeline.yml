@@ -107,20 +107,13 @@ jobs:
          file: backend/Dockerfile
          push: true
          platforms: linux/amd64
-         tags: ${{ secrets.DOCKERHUB_USERNAME }}/guess-the-number-backend:${{ steps.extract_version.outputs.VERSION }}
+         tags: ${{ secrets.DOCKERHUB_USERNAME }}/guess-the-number-backend:${{ steps.extract_version.outputs.VERSION }}, ${{ secrets.DOCKERHUB_USERNAME }}/guess-the-number-backend:latest
  
   deploy:
     name: Deploy to Oracle Cloud
     runs-on: ubuntu-24.04
     needs: [docker-image]
     steps:
-      - name: Extract Project Version
-        id: extract_version
-        run: |
-          cd backend/guess-the-number
-          chmod 777 ./mvnw
-          echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
-
       - name: Deploying Using SSH
         uses: appleboy/ssh-action@master
         with:
@@ -131,5 +124,5 @@ jobs:
           script: |
             mkdir ci-cd
             cd ./ci-cd
-            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/guess-the-number-backend:${{ steps.extract_version.outputs.VERSION }}
+            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/guess-the-number-backend:latest
         
