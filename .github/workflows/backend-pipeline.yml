@@ -114,14 +114,22 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [docker-image]
     steps:
-      - name: Create Deployment Folder
-        run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
-      
-      - name: Copy Docker Image
+      - name: Extract Project Version
+        id: extract_version
         run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
-          cd ci-cd
-          docker run -d -p 8080:8080 diielsilva/guess-the-number-backend:latest
-          EOF
-       
+          cd backend/guess-the-number
+          chmod 777 ./mvnw
+          echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+
+      - name: Deploying Using SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          port: 22
+          script: |
+            mkdir ci-cd
+            cd ./ci-cd
+            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/guess-the-number-backend:${{ steps.extract_version.outputs.VERSION }}
         
