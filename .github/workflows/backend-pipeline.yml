@@ -103,6 +103,7 @@ jobs:
       - name: Build and Push Image to DockerHub
         uses: docker/build-push-action@v5
         with:
+         context: backend
          file: backend/Dockerfile
          push: true
          platforms: linux/amd64
